@@ -16,17 +16,21 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     /// If the syntheizer is currently speaking.
     @Published var isSpeaking: Bool = false
     
+    @Published var voices: [AVSpeechSynthesisVoice] = []
     
     // MARK: - Initialization
-    override init() {
+    init(_ defaultLanguage: String) {
         super.init()
         synthesizer.delegate = self
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+        self.voices = voices.filter { $0.language == defaultLanguage }
     }
     
     // MARK: - Public Methods
     
     func generateSpeech(textInput input: String,
-                        selectedLanguage: LanguageCodeType) {
+                        selectedLanguage: LanguageCodeType,
+                        forVoice voice: AVSpeechSynthesisVoice? = nil) {
         let utterance = AVSpeechUtterance(string: input)
         // Configure the utterance.
         utterance.rate = 1.2
@@ -35,19 +39,22 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         utterance.volume = 0.8
 
         // Retrieve the British English voice.
-        let voice: AVSpeechSynthesisVoice?
-        if selectedLanguage == LanguageCodeType.englishUSA {
-            voice = AVSpeechSynthesisVoice()
+        if voice == nil {
+            utterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
         } else {
-            voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
+            // Assign the voice to the utterance.
+            utterance.voice = voice
         }
         
-        // Assign the voice to the utterance.
-        
-        utterance.voice = voice
-
         // Tell the synthesizer to speak the utterance.
         synthesizer.speak(utterance)
+    }
+    
+    @discardableResult
+    func fetchAvailableVoices(_ language: LanguageCodeType) -> [AVSpeechSynthesisVoice] {
+        let voices = AVSpeechSynthesisVoice.speechVoices()
+        self.voices = voices.filter { $0.language == language.value }
+        return self.voices
     }
     
     // MARK: - AVSpeechSynthesizerDelegate

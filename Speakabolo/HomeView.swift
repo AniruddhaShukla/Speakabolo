@@ -15,7 +15,9 @@ struct HomeView: View {
     
     @State private var selectedLanguage = LanguageCodeType.englishGreatBritain
     
-    @ObservedObject var model = SpeechModel()
+    @ObservedObject var model = SpeechModel(LanguageCodeType.englishGreatBritain.value)
+    
+    @State private var selectedVoice = AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
     
     var body: some View {
         VStack(alignment: .center) {
@@ -23,27 +25,37 @@ struct HomeView: View {
                 ForEach(LanguageCodeType.allCases, id: \.self) {
                     Text($0.value)
                 }
-            }
-            .pickerStyle(.menu)
+            }.onChange(of: selectedLanguage) { _ in
+                self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
+            }.pickerStyle(.menu)
+            
+            
+            Picker("Select Voice", selection: $selectedVoice) {
+                ForEach(model.voices, id: \.self) {
+                    Text($0.name)
+                }
+            }.pickerStyle(.menu)
+            
             ScrollView {
-                TextEditor(text: $textInput)
+                TextEditor(text: $textInput).font(.title3)
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
             
             HStack {
                 Button(action: {
-                    model.generateSpeech(textInput: textInput, selectedLanguage: selectedLanguage)
+                    model.generateSpeech(textInput: textInput,
+                                         selectedLanguage: selectedLanguage,
+                                         forVoice: selectedVoice)
                 }, label: {
                     Text("Speak")
                 }).disabled(model.isSpeaking || textInput.isEmpty)
                 Button(action: {
                     model.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
                 }, label: {
-                    Text("Stop")
+                    Text("Cancel")
                 }).disabled(!model.isSpeaking)
             }
-
             Spacer()
         }.padding()
     }
