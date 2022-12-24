@@ -28,26 +28,32 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     
     // MARK: - Public Methods
     
+    var currentUtterance: AVSpeechUtterance?
+    
     func generateSpeech(textInput input: String,
                         selectedLanguage: LanguageCodeType,
+                        volume: Float,
+                        pitch: Float = 1.0,
+                        speed: Float,
                         forVoice voice: AVSpeechSynthesisVoice? = nil) {
-        let utterance = AVSpeechUtterance(string: input)
+        currentUtterance = AVSpeechUtterance(string: input)
+        guard let currentUtterance else { return }
         // Configure the utterance.
-        utterance.rate = 1.2
-        utterance.pitchMultiplier = 0.8
-        utterance.postUtteranceDelay = 0.2
-        utterance.volume = 0.8
+        currentUtterance.rate = speed
+        currentUtterance.pitchMultiplier = pitch
+        currentUtterance.postUtteranceDelay = 0.2
+        currentUtterance.volume = volume
 
         // Retrieve the British English voice.
         if voice == nil {
-            utterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
+            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
         } else {
             // Assign the voice to the utterance.
-            utterance.voice = voice
+            currentUtterance.voice = voice
         }
         
         // Tell the synthesizer to speak the utterance.
-        synthesizer.speak(utterance)
+        synthesizer.speak(currentUtterance)
     }
     
     @discardableResult

@@ -19,6 +19,10 @@ struct HomeView: View {
     
     @State private var selectedVoice = AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
     
+    @State private var volume: Float = 0.8
+    @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
+    @State private var pitch: Float = 1.0
+    
     var body: some View {
         VStack(alignment: .center) {
             Picker("Select Language", selection: $selectedLanguage) {
@@ -28,8 +32,7 @@ struct HomeView: View {
             }.onChange(of: selectedLanguage) { _ in
                 self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
             }.pickerStyle(.menu)
-            
-            
+
             Picker("Select Voice", selection: $selectedVoice) {
                 ForEach(model.voices, id: \.self) {
                     Text($0.name)
@@ -42,10 +45,31 @@ struct HomeView: View {
                     .multilineTextAlignment(.leading)
             }
             
+            VStack(alignment: .leading) {
+                Text("Volume: \(volume)")
+                Slider(value: $volume, in: 0.0...1.0) {
+                }.disabled(model.isSpeaking)
+            }
+            
+            VStack(alignment: .leading) {
+                Text("Speed: \(speed)")
+                Slider(value: $speed, in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate) {
+                }.disabled(model.isSpeaking)
+
+            }
+            
+            VStack(alignment: .leading) {
+                Text("Pitch: \(pitch)")
+                Slider(value: $pitch, in: 0.5...2.0) {
+                }.disabled(model.isSpeaking)
+                
+            }
             HStack {
                 Button(action: {
                     model.generateSpeech(textInput: textInput,
                                          selectedLanguage: selectedLanguage,
+                                         volume: volume,
+                                         pitch: pitch, speed: speed,
                                          forVoice: selectedVoice)
                 }, label: {
                     Text("Speak")
