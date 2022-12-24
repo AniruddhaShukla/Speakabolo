@@ -36,7 +36,7 @@ struct HomeView: View {
                     model.generateSpeech(textInput: textInput, selectedLanguage: selectedLanguage)
                 }, label: {
                     Text("Speak")
-                }).disabled(model.isSpeaking)
+                }).disabled(model.isSpeaking || textInput.isEmpty)
                 Button(action: {
                     model.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
                 }, label: {
