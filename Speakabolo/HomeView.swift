@@ -13,7 +13,7 @@ struct HomeView: View {
     
     @State var textInput: String = "Enter or paste text"
     
-    @State private var selectedLanguage = LanguageCodeType.englishUSA
+    @State private var selectedLanguage = LanguageCodeType.englishGreatBritain
     
     @ObservedObject var model = SpeechModel()
     
