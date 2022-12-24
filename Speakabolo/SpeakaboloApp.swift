@@ -11,7 +11,7 @@ import SwiftUI
 struct SpeakaboloApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView().frame(width: 800, height: 800)
         }
     }
 }

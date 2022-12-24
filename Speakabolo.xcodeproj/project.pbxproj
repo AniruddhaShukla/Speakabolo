@@ -8,18 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		54FE52D7295683240042B1E4 /* SpeakaboloApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */; };
-		54FE52D9295683240042B1E4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52D8295683240042B1E4 /* ContentView.swift */; };
 		54FE52DB295683260042B1E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DA295683260042B1E4 /* Assets.xcassets */; };
 		54FE52DE295683260042B1E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DD295683260042B1E4 /* Preview Assets.xcassets */; };
+		54FE52E7295683B80042B1E4 /* SpeechModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52E6295683B80042B1E4 /* SpeechModel.swift */; };
+		54FE52E9295683DC0042B1E4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52E8295683DC0042B1E4 /* HomeView.swift */; };
+		54FE52EB295683FE0042B1E4 /* LanguageCodeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52EA295683FE0042B1E4 /* LanguageCodeType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		54FE52D3295683240042B1E4 /* Speakabolo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speakabolo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakaboloApp.swift; sourceTree = "<group>"; };
-		54FE52D8295683240042B1E4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		54FE52DA295683260042B1E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		54FE52DD295683260042B1E4 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		54FE52DF295683260042B1E4 /* Speakabolo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Speakabolo.entitlements; sourceTree = "<group>"; };
+		54FE52E6295683B80042B1E4 /* SpeechModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechModel.swift; sourceTree = "<group>"; };
+		54FE52E8295683DC0042B1E4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		54FE52EA295683FE0042B1E4 /* LanguageCodeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageCodeType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,11 +56,12 @@
 		54FE52D5295683240042B1E4 /* Speakabolo */ = {
 			isa = PBXGroup;
 			children = (
+				54FE52E5295683AE0042B1E4 /* Model */,
 				54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */,
-				54FE52D8295683240042B1E4 /* ContentView.swift */,
 				54FE52DA295683260042B1E4 /* Assets.xcassets */,
 				54FE52DF295683260042B1E4 /* Speakabolo.entitlements */,
 				54FE52DC295683260042B1E4 /* Preview Content */,
+				54FE52E8295683DC0042B1E4 /* HomeView.swift */,
 			);
 			path = Speakabolo;
 			sourceTree = "<group>";
@@ -67,6 +72,15 @@
 				54FE52DD295683260042B1E4 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		54FE52E5295683AE0042B1E4 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				54FE52E6295683B80042B1E4 /* SpeechModel.swift */,
+				54FE52EA295683FE0042B1E4 /* LanguageCodeType.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -139,8 +153,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				54FE52D9295683240042B1E4 /* ContentView.swift in Sources */,
+				54FE52E7295683B80042B1E4 /* SpeechModel.swift in Sources */,
+				54FE52E9295683DC0042B1E4 /* HomeView.swift in Sources */,
 				54FE52D7295683240042B1E4 /* SpeakaboloApp.swift in Sources */,
+				54FE52EB295683FE0042B1E4 /* LanguageCodeType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
