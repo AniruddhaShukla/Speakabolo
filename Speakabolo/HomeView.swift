@@ -24,46 +24,29 @@ struct HomeView: View {
     @State private var pitch: Float = 1.0
     
     var body: some View {
+        NavigationView {
+            createSettingsView().padding().layoutPriority(1)
+            createMainView().padding().layoutPriority(2)
+        }.toolbar {
+            ToolbarItem(placement: .navigation) {
+                Button(action: {
+                    toggleSidebar()
+                }, label: {
+                    Image(systemName: "sidebar.left")
+                })
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func createMainView() -> some View {
         VStack(alignment: .center) {
-            Picker("Select Language", selection: $selectedLanguage) {
-                ForEach(LanguageCodeType.allCases, id: \.self) {
-                    Text($0.value)
-                }
-            }.onChange(of: selectedLanguage) { _ in
-                self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
-            }.pickerStyle(.menu)
-
-            Picker("Select Voice", selection: $selectedVoice) {
-                ForEach(model.voices, id: \.self) {
-                    Text($0.name)
-                }
-            }.pickerStyle(.menu)
-            
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
             
-            VStack(alignment: .leading) {
-                Text("Volume: \(volume)")
-                Slider(value: $volume, in: 0.0...1.0) {
-                }.disabled(model.isSpeaking)
-            }
-            
-            VStack(alignment: .leading) {
-                Text("Speed: \(speed)")
-                Slider(value: $speed, in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate) {
-                }.disabled(model.isSpeaking)
-
-            }
-            
-            VStack(alignment: .leading) {
-                Text("Pitch: \(pitch)")
-                Slider(value: $pitch, in: 0.5...2.0) {
-                }.disabled(model.isSpeaking)
-                
-            }
             HStack {
                 Button(action: {
                     model.generateSpeech(textInput: textInput,
@@ -87,6 +70,52 @@ struct HomeView: View {
                 })
             }
             Spacer()
-        }.padding()
+        }
+    }
+    @ViewBuilder
+    private func createSettingsView() -> some View {
+        List {
+            Text("Audio Settings").bold().font(.title2)
+            
+            Picker("Language", selection: $selectedLanguage) {
+                ForEach(LanguageCodeType.allCases, id: \.self) {
+                    Text($0.value)
+                }
+            }.onChange(of: selectedLanguage) { _ in
+                self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
+            }.pickerStyle(.menu)
+
+            Picker("Voice", selection: $selectedVoice) {
+                ForEach(model.voices, id: \.self) {
+                    Text($0.name)
+                }
+            }.pickerStyle(.menu)
+            HStack(alignment: .center) {
+                Text("Volume")
+                Slider(value: $volume, in: 0.0...1.0) {
+                }.disabled(model.isSpeaking)
+            }
+            
+            HStack(alignment: .center) {
+                Text("Speed")
+                Slider(value: $speed, in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate) {
+                }.disabled(model.isSpeaking)
+
+            }
+            
+            HStack(alignment: .center) {
+                Text("Pitch")
+                Slider(value: $pitch, in: 0.5...2.0) {
+                }.disabled(model.isSpeaking)
+                
+            }
+            Spacer()
+        }
+    }
+    private func toggleSidebar() { // 2
+        #if os(iOS)
+        #else
+        NSApp.keyWindow?.firstResponder?.tryToPerform(#selector(NSSplitViewController.toggleSidebar(_:)), with: nil)
+        #endif
     }
 }

@@ -11,7 +11,9 @@ import SwiftUI
 struct SpeakaboloApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView().frame(width: 800, height: 800)
+            HomeView().frame(width: 1200, height: 800)
+        }.commands {
+            SidebarCommands()
         }
     }
 }
