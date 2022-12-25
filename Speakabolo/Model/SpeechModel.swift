@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import NaturalLanguage
 import AVFoundation
 
 final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
@@ -21,6 +22,8 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     @Published var voices: [AVSpeechSynthesisVoice] = []
     
     @Published var finishedCreatingAudioFile: Bool = false
+    
+    @Published var detectedLanguage: NLLanguage?
     
     var output: AVAudioFile?
     
@@ -58,6 +61,16 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     }
     
     // MARK: - Public Methods
+    
+    func process(input: String) {
+        let languageRecognizer = NLLanguageRecognizer()
+        languageRecognizer.processString(input)
+        if let dominantLanguage = languageRecognizer.dominantLanguage {
+            self.detectedLanguage = dominantLanguage
+        } else {
+            print("Unable to detect language.")
+        }
+    }
     
     func generateSpeech(textInput input: String,
                         selectedLanguage: LanguageCodeType,

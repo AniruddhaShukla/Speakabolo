@@ -24,6 +24,8 @@ struct HomeView: View {
     @State private var pitch: Float = 1.0
     @State private var audioControlImage = Image(systemName: "play.circle")
     
+    @State private var suggestedLanguage: String = "en-G"
+    
     var body: some View {
         NavigationView {
             createSettingsView().padding().layoutPriority(1)
@@ -60,8 +62,17 @@ struct HomeView: View {
     @ViewBuilder
     private func createMainView() -> some View {
         VStack(alignment: .center) {
+            if let language = model.detectedLanguage {
+                Text("Detected Language: \(language.rawValue)")
+                    .foregroundColor(.gray).font(.caption)
+            } else {
+                Text("")
+            }
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
+                    .onChange(of: textInput) { value in
+                        model.process(input: textInput)
+                    }
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
@@ -70,7 +81,7 @@ struct HomeView: View {
             }, label: {
                 Text("Export")
             })
-            Spacer()
+            
         }
     }
     @ViewBuilder
