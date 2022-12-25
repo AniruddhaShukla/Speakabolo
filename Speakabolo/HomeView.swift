@@ -79,6 +79,12 @@ struct HomeView: View {
                 }, label: {
                     Text("Cancel")
                 }).disabled(!model.isSpeaking)
+                
+                Button(action: {
+                    model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, speed: speed, forVoice: selectedVoice)
+                }, label: {
+                    Text("Export")
+                })
             }
             Spacer()
         }.padding()
