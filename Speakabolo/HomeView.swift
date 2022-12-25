@@ -22,18 +22,37 @@ struct HomeView: View {
     @State private var volume: Float = 0.8
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
     @State private var pitch: Float = 1.0
+    @State private var audioControlImage = Image(systemName: "play.circle")
     
     var body: some View {
         NavigationView {
             createSettingsView().padding().layoutPriority(1)
             createMainView().padding().layoutPriority(2)
         }.toolbar {
-            ToolbarItem(placement: .navigation) {
+            ToolbarItemGroup(placement: .navigation) {
                 Button(action: {
                     toggleSidebar()
                 }, label: {
                     Image(systemName: "sidebar.left")
                 })
+                Button(action: {
+                    // Invoke Play Action
+                    model.generateSpeech(textInput: textInput,
+                                         selectedLanguage: selectedLanguage,
+                                         volume: volume,
+                                         pitch: pitch, speed: speed,
+                                         forVoice: selectedVoice)
+                }, label: {
+                    Image(systemName: "play.circle.fill")
+                }).disabled(model.isSpeaking || textInput.isEmpty)
+                
+                Button(action: {
+                    // Invoke Cancel action
+                    model.synthesizer.stopSpeaking(at: .immediate)
+                }, label: {
+                    Image(systemName: "stop.circle.fill")
+                }).disabled(!model.isSpeaking)
+                
             }
         }
     }
@@ -46,29 +65,11 @@ struct HomeView: View {
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
-            
-            HStack {
-                Button(action: {
-                    model.generateSpeech(textInput: textInput,
-                                         selectedLanguage: selectedLanguage,
-                                         volume: volume,
-                                         pitch: pitch, speed: speed,
-                                         forVoice: selectedVoice)
-                }, label: {
-                    Text("Speak")
-                }).disabled(model.isSpeaking || textInput.isEmpty)
-                Button(action: {
-                    model.synthesizer.stopSpeaking(at: AVSpeechBoundary.immediate)
-                }, label: {
-                    Text("Cancel")
-                }).disabled(!model.isSpeaking)
-                
-                Button(action: {
-                    model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, speed: speed, forVoice: selectedVoice)
-                }, label: {
-                    Text("Export")
-                })
-            }
+            Button(action: {
+                model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, speed: speed, forVoice: selectedVoice)
+            }, label: {
+                Text("Export")
+            })
             Spacer()
         }
     }
