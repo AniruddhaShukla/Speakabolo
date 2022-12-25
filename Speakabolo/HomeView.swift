@@ -23,6 +23,8 @@ struct HomeView: View {
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
     @State private var pitch: Float = 1.0
     
+    @State var urlStringToText: String = ""
+    
     var body: some View {
         VStack(alignment: .center) {
             Picker("Select Language", selection: $selectedLanguage) {
@@ -38,6 +40,17 @@ struct HomeView: View {
                     Text($0.name)
                 }
             }.pickerStyle(.menu)
+            Spacer(minLength: 8.0)
+            HStack {
+                Image(systemName: "globe")
+                TextField("", text: $urlStringToText)
+                Button(action: {
+                    let textInputString = model.convertURLToText(url: urlStringToText)
+                    self.textInput = textInputString
+                }, label: {
+                    Text("Go")
+                })
+            }
             
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)

@@ -7,6 +7,7 @@
 
 import Foundation
 import AVFoundation
+import SwiftSoup
 
 final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
     
@@ -83,6 +84,22 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         
         // Tell the synthesizer to speak the utterance.
         synthesizer.speak(currentUtterance)
+    }
+    
+    func convertURLToText(url: String) -> String {
+
+        do {
+            let html = try String(contentsOf: URL(string: url)!)
+            let doc = try SwiftSoup.parse(html)
+            let titleContent = try doc.select("h1.qa-story-headline")
+            let mainContent = try doc.select("div.qa-story-body")
+            let titleText = try titleContent.text()
+            let text = try mainContent.text()
+            return titleText + "\n\n\n" + text
+        } catch(let error) {
+            print(error.localizedDescription)
+            return ""
+        }
     }
     
     @discardableResult

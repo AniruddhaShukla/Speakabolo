@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5424C925295813BC006F355D /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 5424C924295813BC006F355D /* SwiftSoup */; };
 		54FE52D7295683240042B1E4 /* SpeakaboloApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */; };
 		54FE52DB295683260042B1E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DA295683260042B1E4 /* Assets.xcassets */; };
 		54FE52DE295683260042B1E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DD295683260042B1E4 /* Preview Assets.xcassets */; };
@@ -31,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5424C925295813BC006F355D /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +101,9 @@
 			dependencies = (
 			);
 			name = Speakabolo;
+			packageProductDependencies = (
+				5424C924295813BC006F355D /* SwiftSoup */,
+			);
 			productName = Speakabolo;
 			productReference = 54FE52D3295683240042B1E4 /* Speakabolo.app */;
 			productType = "com.apple.product-type.application";
@@ -127,6 +132,9 @@
 				Base,
 			);
 			mainGroup = 54FE52CA295683240042B1E4;
+			packageReferences = (
+				5424C923295813BC006F355D /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+			);
 			productRefGroup = 54FE52D4295683240042B1E4 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -352,6 +360,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5424C923295813BC006F355D /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		5424C924295813BC006F355D /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5424C923295813BC006F355D /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 54FE52CB295683240042B1E4 /* Project object */;
 }
