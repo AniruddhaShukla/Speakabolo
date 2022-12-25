@@ -77,40 +77,37 @@ struct HomeView: View {
     private func createSettingsView() -> some View {
         List {
             Text("Audio Settings").bold().font(.title2)
+            Section("Language") {
+                Picker("", selection: $selectedLanguage) {
+                    ForEach(LanguageCodeType.allCases, id: \.self) {
+                        Text($0.value)
+                    }
+                }.onChange(of: selectedLanguage) { _ in
+                    self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
+                }.pickerStyle(.menu)
+            }
+            Section("Voice") {
+                Picker("", selection: $selectedVoice) {
+                    ForEach(model.voices, id: \.self) {
+                        Text($0.name)
+                    }
+                }.pickerStyle(.menu)
+            }
             
-            Picker("Language", selection: $selectedLanguage) {
-                ForEach(LanguageCodeType.allCases, id: \.self) {
-                    Text($0.value)
-                }
-            }.onChange(of: selectedLanguage) { _ in
-                self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
-            }.pickerStyle(.menu)
-
-            Picker("Voice", selection: $selectedVoice) {
-                ForEach(model.voices, id: \.self) {
-                    Text($0.name)
-                }
-            }.pickerStyle(.menu)
-            HStack(alignment: .center) {
-                Text("Volume")
+            Section("Volume") {
                 Slider(value: $volume, in: 0.0...1.0) {
                 }.disabled(model.isSpeaking)
             }
             
-            HStack(alignment: .center) {
-                Text("Speed")
+            Section("Speed") {
                 Slider(value: $speed, in: AVSpeechUtteranceMinimumSpeechRate...AVSpeechUtteranceMaximumSpeechRate) {
                 }.disabled(model.isSpeaking)
-
             }
             
-            HStack(alignment: .center) {
-                Text("Pitch")
+            Section("Pitch") {
                 Slider(value: $pitch, in: 0.5...2.0) {
                 }.disabled(model.isSpeaking)
-                
             }
-            Spacer()
         }
     }
     private func toggleSidebar() { // 2
