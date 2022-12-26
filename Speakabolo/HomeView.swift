@@ -17,7 +17,6 @@ struct HomeView: View {
     
     @ObservedObject var model = SpeechModel(Locale.preferredLanguages.first ?? "en-US")
     
-    @State private var selectedVoice = AVSpeechSynthesisVoice(language: "en-US")!
     
     @State private var volume: Float = 0.8
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
@@ -43,7 +42,7 @@ struct HomeView: View {
                                          selectedLanguage: selectedLanguage,
                                          volume: volume,
                                          pitch: pitch, speed: speed,
-                                         forVoice: selectedVoice)
+                                         forVoice: model.selectedVoice)
                 }, label: {
                     Image(systemName: "play.circle.fill")
                 }).disabled(model.isSpeaking || textInput.isEmpty)
@@ -78,7 +77,11 @@ struct HomeView: View {
             }
             
             Button(action: {
-                model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, speed: speed, forVoice: selectedVoice)
+                model.createAudio(forInput: textInput,
+                                  selectedLanguage: selectedLanguage,
+                                  volume: volume,
+                                  speed: speed,
+                                  forVoice: model.selectedVoice)
             }, label: {
                 Text("Export")
             })
@@ -90,7 +93,7 @@ struct HomeView: View {
         List {
             Text("Audio Settings").bold().font(.title2)
             Section("Voice") {
-                Picker("", selection: $selectedVoice) {
+                Picker("", selection: $model.selectedVoice) {
                     ForEach(model.voices, id: \.self) {
                         Text("\($0.name): \($0.language)")
                     }
