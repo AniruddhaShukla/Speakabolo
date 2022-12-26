@@ -35,7 +35,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         for voice in voices {
             print(voice.name + " \(voice.language)" )
         }
-        self.voices = voices.filter { $0.language == defaultLanguage }
+        self.voices = Array(Set(voices.filter { $0.language == defaultLanguage }))
     }
     
     // MARK: - AVSpeechSynthesizerDelegate
@@ -65,15 +65,17 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     func process(input: String) {
         let languageRecognizer = NLLanguageRecognizer()
         languageRecognizer.processString(input)
+        let voices = AVSpeechSynthesisVoice.speechVoices()
         if let dominantLanguage = languageRecognizer.dominantLanguage {
             self.detectedLanguage = dominantLanguage
+            self.voices = voices.filter { $0.language.contains(self.detectedLanguage?.rawValue ?? "en-US") }
         } else {
             print("Unable to detect language.")
         }
     }
     
     func generateSpeech(textInput input: String,
-                        selectedLanguage: LanguageCodeType,
+                        selectedLanguage: String,
                         volume: Float,
                         pitch: Float = 1.0,
                         speed: Float,
@@ -88,7 +90,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 
         // Retrieve the British English voice.
         if voice == nil {
-            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
+            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage)
         } else {
             // Assign the voice to the utterance.
             currentUtterance.voice = voice
@@ -99,14 +101,14 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     }
     
     @discardableResult
-    func fetchAvailableVoices(_ language: LanguageCodeType) -> [AVSpeechSynthesisVoice] {
+    func fetchAvailableVoices(_ language: String) -> [AVSpeechSynthesisVoice] {
         let voices = AVSpeechSynthesisVoice.speechVoices()
-        self.voices = voices.filter { $0.language == language.value }
+        self.voices = voices.filter { $0.language == language }
         return self.voices
     }
     
     func createAudio(forInput inputText: String,
-                     selectedLanguage: LanguageCodeType,
+                     selectedLanguage: String,
                      volume: Float,
                      pitch: Float = 1.0,
                      speed: Float,
@@ -124,7 +126,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 
         // Retrieve the British English voice.
         if voice == nil {
-            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage.value)
+            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage)
         } else {
             // Assign the voice to the utterance.
             currentUtterance.voice = voice

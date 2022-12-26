@@ -13,18 +13,18 @@ struct HomeView: View {
     
     @State var textInput: String = "Enter or paste text"
     
-    @State private var selectedLanguage = LanguageCodeType.englishGreatBritain
+    @State private var selectedLanguage: String = Locale.preferredLanguages.first ?? "en-US"
     
-    @ObservedObject var model = SpeechModel(LanguageCodeType.englishGreatBritain.value)
+    @ObservedObject var model = SpeechModel(Locale.preferredLanguages.first ?? "en-US")
     
-    @State private var selectedVoice = AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
+    @State private var selectedVoice = AVSpeechSynthesisVoice(language: "en-US")!
     
     @State private var volume: Float = 0.8
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
     @State private var pitch: Float = 1.0
     @State private var audioControlImage = Image(systemName: "play.circle")
     
-    @State private var suggestedLanguage: String = "en-G"
+    @State private var suggestedLanguage: String = "en-GB"
     
     var body: some View {
         NavigationView {
@@ -76,6 +76,7 @@ struct HomeView: View {
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
+            
             Button(action: {
                 model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, speed: speed, forVoice: selectedVoice)
             }, label: {
@@ -88,19 +89,10 @@ struct HomeView: View {
     private func createSettingsView() -> some View {
         List {
             Text("Audio Settings").bold().font(.title2)
-            Section("Language") {
-                Picker("", selection: $selectedLanguage) {
-                    ForEach(LanguageCodeType.allCases, id: \.self) {
-                        Text($0.value)
-                    }
-                }.onChange(of: selectedLanguage) { _ in
-                    self.selectedVoice = model.fetchAvailableVoices(selectedLanguage).first ?? AVSpeechSynthesisVoice(language: LanguageCodeType.englishGreatBritain.value)!
-                }.pickerStyle(.menu)
-            }
             Section("Voice") {
                 Picker("", selection: $selectedVoice) {
                     ForEach(model.voices, id: \.self) {
-                        Text($0.name)
+                        Text("\($0.name): \($0.language)")
                     }
                 }.pickerStyle(.menu)
             }
