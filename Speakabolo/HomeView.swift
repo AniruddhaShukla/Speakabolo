@@ -88,14 +88,32 @@ struct HomeView: View {
             
         }
     }
+    
+    private func isRecommended(_ voice: AVSpeechSynthesisVoice) -> Bool {
+        if let detectedLanguageCode =  model.detectedLanguage?.rawValue {
+            if voice.language.contains(detectedLanguageCode) {
+                return true
+            } else {
+                return false
+            }
+        }
+        return false
+    }
     @ViewBuilder
     private func createSettingsView() -> some View {
         List {
             Text("Audio Settings").bold().font(.title2)
             Section("Voice") {
                 Picker("", selection: $model.selectedVoice) {
-                    ForEach(model.voices, id: \.self) {
-                        Text("\($0.name): \($0.language)")
+                    ForEach(model.voices, id: \.self) { voice in
+                        HStack {
+                            if isRecommended(voice) {
+                                Text("\(voice.name): \(voice.language) - Recommended")
+                            } else {
+                                Text("\(voice.name): \(voice.language)")
+                            }
+                            
+                        }
                     }
                 }.pickerStyle(.menu)
             }

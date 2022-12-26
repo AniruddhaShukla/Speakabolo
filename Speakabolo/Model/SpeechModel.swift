@@ -70,8 +70,14 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         let voices = AVSpeechSynthesisVoice.speechVoices()
         if let dominantLanguage = languageRecognizer.dominantLanguage {
             self.detectedLanguage = dominantLanguage
-            self.voices = voices.filter { $0.language.contains(self.detectedLanguage?.rawValue ?? "en-US") }
-            self.selectedVoice = self.voices.first ?? AVSpeechSynthesisVoice(language: "en-US")!
+            self.voices = voices
+            
+            // Set selected voice to detected language
+            if let autoSelectedVoice = self.voices.first(where: {$0.language.contains(self.detectedLanguage?.rawValue ?? "en-US")}) {
+                self.selectedVoice = autoSelectedVoice
+            } else {
+                self.selectedVoice = self.voices.first ?? AVSpeechSynthesisVoice(language: "en-US")!
+            }
         } else {
             print("Unable to detect language.")
         }
