@@ -9,6 +9,7 @@ import Foundation
 import NaturalLanguage
 import AVFoundation
 import AppKit
+import Combine
 
 final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDelegate, FileManagerDelegate, NSOpenSavePanelDelegate {
     
@@ -37,6 +38,11 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 
     @Published var selectedVoice = AVSpeechSynthesisVoice(language: "en-US")!
     
+    // Progress of the audio playback (0.0 - 1.0)
+    @Published var progress: Float = 0.0
+
+    var cancellables = Set<AnyCancellable>()
+    
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         self.stop()
     }
@@ -54,6 +60,9 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     }
     
     var audioURL: URL?
+    
+    // Subject to publish updates to the progress property
+    let progressSubject = PassthroughSubject<Void, Never>()
 
     func stop() {
         player?.stop()
@@ -70,6 +79,22 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
             player?.play()
             player?.delegate = self
             isSpeaking = true
+            
+            let interval = CMTime(seconds: 0.01, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+             let progressPublisher = Timer
+                .publish(every: interval.seconds, on: .main, in: .common)
+                 .autoconnect()
+                 .map { _ in }
+
+            // Subscribe to the publisher to update the progress property
+               progressPublisher
+                   .sink { [weak self] _ in
+                       guard let self = self else { return }
+                       self.progress = Float(self.player!.currentTime / self.player!.duration)
+                   }
+                   .store(in: &cancellables)
+            
+            
         } catch let error as NSError {
             print(error.localizedDescription)
         } catch {

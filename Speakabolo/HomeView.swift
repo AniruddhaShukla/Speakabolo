@@ -36,6 +36,20 @@ struct HomeView: View {
                 }, label: {
                     Image(systemName: "sidebar.left")
                 })
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func createMainView() -> some View {
+        VStack(alignment: .leading) {
+            if let language = model.detectedLanguage {
+                Text("Detected Language: \(language.rawValue)")
+                    .foregroundColor(.gray).font(.caption)
+            } else {
+                Text("")
+            }
+            HStack(alignment: .center) {
                 Button(action: {
                     // Invoke Play Action
                     model.createAudio(forInput: textInput,
@@ -44,28 +58,19 @@ struct HomeView: View {
                                          pitch: pitch, speed: speed,
                                          forVoice: model.selectedVoice)
                 }, label: {
-                    Image(systemName: "play.circle.fill")
-                }).disabled(model.isSpeaking || textInput.isEmpty)
+                    Image(systemName: "play.fill").resizable().frame(width: 25, height: 25).aspectRatio(contentMode: .fill)
+                }).disabled(model.isSpeaking || textInput.isEmpty).buttonStyle(.plain)
                 
+                Spacer(minLength: 8.0)
                 Button(action: {
                     model.stop()
                 }, label: {
-                    Image(systemName: "stop.circle.fill")
-                }).disabled(!model.isSpeaking)
+                    Image(systemName: "stop.fill").resizable().frame(width: 25, height: 25).aspectRatio(contentMode: .fill)
+                }).disabled(!model.isSpeaking).buttonStyle(.plain)
                 
+                ProgressView("", value: model.progress)
             }
-        }
-    }
-    
-    @ViewBuilder
-    private func createMainView() -> some View {
-        VStack(alignment: .center) {
-            if let language = model.detectedLanguage {
-                Text("Detected Language: \(language.rawValue)")
-                    .foregroundColor(.gray).font(.caption)
-            } else {
-                Text("")
-            }
+            
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
                     .onChange(of: textInput) { value in
