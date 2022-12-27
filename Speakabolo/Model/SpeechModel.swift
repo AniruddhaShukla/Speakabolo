@@ -140,7 +140,8 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     func exportAudio() {
         // Create an NSOpenPanel object to display the save dialog
         let savePanel = NSSavePanel()
-        savePanel.allowedFileTypes = ["m4a", "caf"] // Set the allowed file types (e.g. audio files)
+        savePanel.allowedContentTypes = [UTType.mp3, UTType.mpeg4Audio]
+        savePanel.allowsOtherFileTypes = false
         savePanel.canCreateDirectories = true
         savePanel.begin { (result) in
             if result == .OK {
