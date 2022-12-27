@@ -67,6 +67,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     func stop() {
         player?.stop()
         isSpeaking = false
+        progress = 0.0
     }
     func play(url: URL) {
         guard self.player?.isPlaying ?? false == false else {

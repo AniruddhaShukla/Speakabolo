@@ -86,6 +86,7 @@ struct HomeView: View {
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
                     .onChange(of: textInput) { value in
+                        model.stop()
                         model.process(input: textInput)
                     }
                     .frame(minHeight: 300.0)
