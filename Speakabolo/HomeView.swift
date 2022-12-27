@@ -8,6 +8,7 @@
 
 import AVFoundation
 import SwiftUI
+import AppKit
 
 struct HomeView: View {
     
@@ -52,23 +53,34 @@ struct HomeView: View {
             HStack(alignment: .center) {
                 Button(action: {
                     // Invoke Play Action
-                    model.createAudio(forInput: textInput,
-                                         selectedLanguage: selectedLanguage,
-                                         volume: volume,
-                                         pitch: pitch, speed: speed,
-                                         forVoice: model.selectedVoice)
+                    if model.player?.isPlaying ?? false {
+                        model.player?.pause()
+                    } else {
+                        if model.isSpeaking {
+                            model.player?.play()
+                        } else {
+                            model.createAudio(forInput: textInput,
+                                                 selectedLanguage: selectedLanguage,
+                                                 volume: volume,
+                                                 pitch: pitch, speed: speed,
+                                                 forVoice: model.selectedVoice)
+                        }
+
+                    }
+            
                 }, label: {
-                    Image(systemName: "play.fill").resizable().frame(width: 25, height: 25).aspectRatio(contentMode: .fill)
-                }).disabled(model.isSpeaking || textInput.isEmpty).buttonStyle(.plain)
+                    Image(systemName: model.player?.isPlaying ?? false ? "pause.fill" : "play.fill")
+                        .resizable()
+                        .frame(width: 15, height: 15)
+                        .aspectRatio(contentMode: .fit)
+                }).disabled(textInput.isEmpty).buttonStyle(.plain)
                 
                 Spacer(minLength: 8.0)
-                Button(action: {
-                    model.stop()
-                }, label: {
-                    Image(systemName: "stop.fill").resizable().frame(width: 25, height: 25).aspectRatio(contentMode: .fill)
-                }).disabled(!model.isSpeaking).buttonStyle(.plain)
                 
-                ProgressView("", value: model.progress)
+                //ProgressView("", value: model.progress)
+                Slider(value: $model.progress, in: 0.0...1.0, onEditingChanged: {_ in
+                    model.sliderChanged(to: Double(model.progress))
+                })
             }
             
             ScrollView {
