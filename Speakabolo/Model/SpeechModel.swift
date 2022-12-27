@@ -47,6 +47,26 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         self.stop()
     }
     
+    var elapsedTime: String {
+        guard let duration = player?.currentTime else { return "" }
+        let seconds = Double(duration)
+        let minutes = seconds / 60
+        let remainingSeconds = seconds.truncatingRemainder(dividingBy: 60)
+        let remainingSecondsDouble = Double(remainingSeconds)
+        
+        return ("\(Int(minutes)):\(String(format: "%02d", Int(remainingSecondsDouble)))")
+    }
+    
+    var totalDuration: String {
+        guard let duration = player?.duration else { return "" }
+        let seconds = Double(duration)
+        let minutes = seconds / 60
+        let remainingSeconds = seconds.truncatingRemainder(dividingBy: 60)
+        let remainingSecondsDouble = Double(remainingSeconds)
+        
+        return ("\(Int(minutes)):\(String(format: "%02d", Int(remainingSecondsDouble)))")
+    }
+    
     // MARK: - Initialization
     init(_ defaultLanguage: String) {
         super.init()

@@ -76,11 +76,14 @@ struct HomeView: View {
                 }).disabled(textInput.isEmpty).buttonStyle(.plain)
                 
                 Spacer(minLength: 8.0)
-                
-                //ProgressView("", value: model.progress)
-                Slider(value: $model.progress, in: 0.0...1.0, onEditingChanged: {_ in
-                    model.sliderChanged(to: Double(model.progress))
-                })
+                HStack {
+                    Text(model.elapsedTime).foregroundColor(.gray).font(.footnote)
+                    Slider(value: $model.progress, in: 0.0...1.0, onEditingChanged: {_ in
+                        model.sliderChanged(to: Double(model.progress))
+                    })
+                    Text(model.totalDuration).foregroundColor(.gray).font(.footnote)
+                }
+
             }
             
             ScrollView {
