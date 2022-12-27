@@ -38,7 +38,7 @@ struct HomeView: View {
                 })
                 Button(action: {
                     // Invoke Play Action
-                    model.generateSpeech(textInput: textInput,
+                    model.createAudio(forInput: textInput,
                                          selectedLanguage: selectedLanguage,
                                          volume: volume,
                                          pitch: pitch, speed: speed,
@@ -48,8 +48,7 @@ struct HomeView: View {
                 }).disabled(model.isSpeaking || textInput.isEmpty)
                 
                 Button(action: {
-                    // Invoke Cancel action
-                    model.synthesizer.stopSpeaking(at: .immediate)
+                    model.stop()
                 }, label: {
                     Image(systemName: "stop.circle.fill")
                 }).disabled(!model.isSpeaking)
@@ -77,11 +76,7 @@ struct HomeView: View {
             }
             
             Button(action: {
-                model.createAudio(forInput: textInput,
-                                  selectedLanguage: selectedLanguage,
-                                  volume: volume,
-                                  speed: speed,
-                                  forVoice: model.selectedVoice)
+                model.exportAudio()
             }, label: {
                 Text("Export")
             })

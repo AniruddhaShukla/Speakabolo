@@ -8,8 +8,14 @@
 import Foundation
 import NaturalLanguage
 import AVFoundation
+import AppKit
 
-final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate {
+final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAudioPlayerDelegate, FileManagerDelegate, NSOpenSavePanelDelegate {
+    
+    func fileManager(_ fileManager: FileManager, shouldCopyItemAt srcURL: URL, to dstURL: URL) -> Bool {
+        return true
+    }
+    
     
     /// The synthezier which converts text to speech.
     let synthesizer = AVSpeechSynthesizer()
@@ -27,7 +33,13 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     
     var output: AVAudioFile?
     
+    var player: AVAudioPlayer?
+
     @Published var selectedVoice = AVSpeechSynthesisVoice(language: "en-US")!
+    
+    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+        self.stop()
+    }
     
     // MARK: - Initialization
     init(_ defaultLanguage: String) {
@@ -38,7 +50,33 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
             print(voice.name + " \(voice.language)" )
         }
         self.voices = Array(Set(voices.filter { $0.language == defaultLanguage }))
+        FileManager.default.delegate = self
     }
+    
+    var audioURL: URL?
+
+    func stop() {
+        player?.stop()
+        isSpeaking = false
+    }
+    func play(url: URL) {
+        guard self.player?.isPlaying ?? false == false else {
+            return
+        }
+        do {
+            self.player = try AVAudioPlayer(contentsOf: url)
+            player?.prepareToPlay()
+            player?.volume = 1.0
+            player?.play()
+            player?.delegate = self
+            isSpeaking = true
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        } catch {
+            print("AVAudioPlayer init failed")
+        }
+    }
+
     
     // MARK: - AVSpeechSynthesizerDelegate
     
@@ -50,6 +88,14 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         print("Speech finished.")
         self.isSpeaking = false
+        self.audioURL = URL(fileURLWithPath: "test.caf")
+        // Play audio
+        if let url = audioURL {
+            self.play(url: url)
+        } else {
+            print("No url found to play. Aborting.")
+        }
+        
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
@@ -83,37 +129,35 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         }
     }
     
-    func generateSpeech(textInput input: String,
-                        selectedLanguage: String,
-                        volume: Float,
-                        pitch: Float = 1.0,
-                        speed: Float,
-                        forVoice voice: AVSpeechSynthesisVoice? = nil) {
-        currentUtterance = AVSpeechUtterance(string: input)
-        guard let currentUtterance else { return }
-        // Configure the utterance.
-        currentUtterance.rate = speed
-        currentUtterance.pitchMultiplier = pitch
-        currentUtterance.postUtteranceDelay = 0.2
-        currentUtterance.volume = volume
-
-        // Retrieve the British English voice.
-        if voice == nil {
-            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage)
-        } else {
-            // Assign the voice to the utterance.
-            currentUtterance.voice = voice
-        }
-        
-        // Tell the synthesizer to speak the utterance.
-        synthesizer.speak(currentUtterance)
-    }
-    
     @discardableResult
     func fetchAvailableVoices(_ language: String) -> [AVSpeechSynthesisVoice] {
         let voices = AVSpeechSynthesisVoice.speechVoices()
         self.voices = voices.filter { $0.language == language }
         return self.voices
+    }
+    
+    // Declare an IBAction for the export button or menu option
+    func exportAudio() {
+        // Create an NSOpenPanel object to display the save dialog
+        let savePanel = NSSavePanel()
+        savePanel.allowedFileTypes = ["m4a", "caf"] // Set the allowed file types (e.g. audio files)
+        savePanel.canCreateDirectories = true
+        savePanel.begin { (result) in
+            if result == .OK {
+                // The user selected a location to save the file
+                if let url = savePanel.url, let audioURL = self.audioURL {
+                    // Get the audio file URL from the view model
+                    do {
+                        // Use the FileManager to copy the audio file to the selected location
+                        try FileManager.default.copyItem(at: audioURL, to: url)
+                    } catch(let error) {
+                        // An error occurred while trying to copy the file
+                        // You may want to display an error message to the user here
+                        print(error.localizedDescription)
+                    }
+                }
+            }
+        }
     }
     
     func createAudio(forInput inputText: String,
@@ -122,6 +166,12 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
                      pitch: Float = 1.0,
                      speed: Float,
                      forVoice voice: AVSpeechSynthesisVoice? = nil) {
+        if player?.isPlaying ?? false {
+            print("A play is already in progress.")
+            player?.stop()
+        }
+        
+        self.output = nil
         currentUtterance = AVSpeechUtterance(string: inputText)
         guard let currentUtterance = currentUtterance else {
             print("Something went wrong.")
