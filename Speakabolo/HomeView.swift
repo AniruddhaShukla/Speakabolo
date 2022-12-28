@@ -96,7 +96,7 @@ struct HomeView: View {
                     textInput = ""
                     model.stop()
                 }, label: {
-                    Text("StartOver")
+                    Text("Start Over")
                 }).disabled(textInput.isEmpty)
 
             }
