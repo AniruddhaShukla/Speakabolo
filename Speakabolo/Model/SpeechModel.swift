@@ -41,12 +41,15 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     // Progress of the audio playback (0.0 - 1.0)
     @Published var progress: Float = 0.0
 
-    var cancellables = Set<AnyCancellable>()
+    var cancellable: Cancellable?
     
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         self.stop()
+        print("Unsubscribing from the Timer.")
+        cancellable?.cancel()
     }
     
+    // MARK: - Computed Properties
     var elapsedTime: String {
         guard let duration = player?.currentTime else { return "" }
         let seconds = Double(duration)
@@ -81,14 +84,30 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     
     var audioURL: URL?
     
-    // Subject to publish updates to the progress property
-    let progressSubject = PassthroughSubject<Void, Never>()
-
+    
+    func pause() {
+        self.player?.pause()
+        self.isSpeaking = false 
+        cancellable?.cancel()
+    }
+    
+    func resumePlaying() {
+        self.isSpeaking = true
+        cancellable = Timer.publish(every: 0.01, on: .main, in: .default)
+            .autoconnect().sink { [weak self] _ in
+                guard let self = self else { return }
+                self.progress = Float(self.player!.currentTime / self.player!.duration)
+            }
+        self.player?.play()
+    }
+    
     func stop() {
         player?.stop()
         isSpeaking = false
         progress = 0.0
     }
+    
+    
     func play(url: URL) {
         guard self.player?.isPlaying ?? false == false else {
             return
@@ -101,21 +120,12 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
             player?.delegate = self
             isSpeaking = true
             
-            let interval = CMTime(seconds: 0.01, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
-             let progressPublisher = Timer
-                .publish(every: interval.seconds, on: .main, in: .common)
-                 .autoconnect()
-                 .map { _ in }
+            cancellable = Timer.publish(every: 0.01, on: .main, in: .default)
+                .autoconnect().sink { [weak self] _ in
+                    guard let self = self else { return }
+                    self.progress = Float(self.player!.currentTime / self.player!.duration)
+                }
 
-            // Subscribe to the publisher to update the progress property
-               progressPublisher
-                   .sink { [weak self] _ in
-                       guard let self = self else { return }
-                       self.progress = Float(self.player!.currentTime / self.player!.duration)
-                   }
-                   .store(in: &cancellables)
-            
-            
         } catch let error as NSError {
             print(error.localizedDescription)
         } catch {
@@ -157,6 +167,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     // MARK: - Public Methods
     
     func process(input: String) {
+        guard detectedLanguage == nil else { return }
         let languageRecognizer = NLLanguageRecognizer()
         languageRecognizer.processString(input)
         let voices = AVSpeechSynthesisVoice.speechVoices()

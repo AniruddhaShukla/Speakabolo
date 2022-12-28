@@ -54,10 +54,10 @@ struct HomeView: View {
                 Button(action: {
                     // Invoke Play Action
                     if model.player?.isPlaying ?? false {
-                        model.player?.pause()
+                        model.pause()
                     } else {
                         if model.isSpeaking {
-                            model.player?.play()
+                            model.resumePlaying()
                         } else {
                             model.createAudio(forInput: textInput,
                                                  selectedLanguage: selectedLanguage,
@@ -82,7 +82,22 @@ struct HomeView: View {
                         model.sliderChanged(to: Double(model.progress))
                     })
                     Text(model.totalDuration).foregroundColor(.gray).font(.footnote)
+                    
                 }
+                
+                Button(action: {
+                    model.exportAudio()
+                }, label: {
+                    Text("Export")
+                }).disabled(textInput.isEmpty || model.audioURL == nil)
+                
+                
+                Button(action: {
+                    textInput = ""
+                    model.stop()
+                }, label: {
+                    Text("StartOver")
+                }).disabled(textInput.isEmpty)
 
             }
             
@@ -95,13 +110,6 @@ struct HomeView: View {
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
             }
-            
-            Button(action: {
-                model.exportAudio()
-            }, label: {
-                Text("Export")
-            })
-            
         }
     }
     
