@@ -87,7 +87,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     
     func pause() {
         self.player?.pause()
-        self.isSpeaking = false 
+        self.isSpeaking = false
         cancellable?.cancel()
     }
     
@@ -281,14 +281,13 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 }
 extension SpeechModel {
     func sliderChanged(to newValue: Double) {
-        print("Slider value changed?")
         guard let duration = self.player?.duration else { return }
         
         self.player?.pause()
         self.player?.currentTime = duration * newValue
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: {
-            self.player?.play()
+            self.resumePlaying()
+            
         })
-        
     }
 }

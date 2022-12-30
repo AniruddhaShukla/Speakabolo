@@ -53,10 +53,10 @@ struct HomeView: View {
             HStack(alignment: .center) {
                 Button(action: {
                     // Invoke Play Action
-                    if model.player?.isPlaying ?? false {
+                    if model.isSpeaking {
                         model.pause()
                     } else {
-                        if model.isSpeaking {
+                        if !(model.player?.isPlaying ?? true) {
                             model.resumePlaying()
                         } else {
                             model.createAudio(forInput: textInput,
@@ -80,7 +80,7 @@ struct HomeView: View {
                     Text(model.elapsedTime).foregroundColor(.gray).font(.footnote)
                     Slider(value: $model.progress, in: 0.0...1.0, onEditingChanged: {_ in
                         model.sliderChanged(to: Double(model.progress))
-                    })
+                    }).disabled(textInput.isEmpty)
                     Text(model.totalDuration).foregroundColor(.gray).font(.footnote)
                     
                 }
