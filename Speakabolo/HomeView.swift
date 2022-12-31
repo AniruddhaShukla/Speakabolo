@@ -18,6 +18,8 @@ struct HomeView: View {
     
     @ObservedObject var model = SpeechModel(Locale.preferredLanguages.first ?? "en-US")
     
+    @State var startOverAlertDisplayed: Bool = false
+    
     
     @State private var volume: Float = 0.8
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
@@ -38,6 +40,13 @@ struct HomeView: View {
                     Image(systemName: "sidebar.left")
                 })
             }
+        }.alert(isPresented: $startOverAlertDisplayed) {
+            Alert(title: Text("Starting Over"), message: Text("You are about to start over. Any text entered will be cleared and previously generated audio if any will be cleared. Do you want to continue?"), primaryButton: .default(Text("Yes"), action: {
+                textInput = ""
+                model.startOver()
+                       }), secondaryButton: .cancel(Text("Cancel"), action: {
+                           
+                       }))
         }
     }
     
@@ -93,8 +102,7 @@ struct HomeView: View {
                 
                 
                 Button(action: {
-                    textInput = ""
-                    model.startOver()
+                    startOverAlertDisplayed.toggle()
                 }, label: {
                     Text("Start Over")
                 }).disabled(textInput.isEmpty)
