@@ -43,6 +43,10 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 
     var cancellable: Cancellable?
     
+    var isInAudioSession: Bool {
+        return isSpeaking || audioURL != nil || player?.isPlaying ?? false
+    }
+    
     func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
         self.stop()
         print("Unsubscribing from the Timer.")
@@ -99,6 +103,11 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
                 self.progress = Float(self.player!.currentTime / self.player!.duration)
             }
         self.player?.play()
+    }
+    
+    func startOver() {
+        stop()
+        self.audioURL = nil
     }
     
     func stop() {

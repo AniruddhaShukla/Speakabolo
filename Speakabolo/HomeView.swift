@@ -56,7 +56,7 @@ struct HomeView: View {
                     if model.isSpeaking {
                         model.pause()
                     } else {
-                        if !(model.player?.isPlaying ?? true) {
+                        if model.isInAudioSession {
                             model.resumePlaying()
                         } else {
                             model.createAudio(forInput: textInput,
@@ -94,7 +94,7 @@ struct HomeView: View {
                 
                 Button(action: {
                     textInput = ""
-                    model.stop()
+                    model.startOver()
                 }, label: {
                     Text("Start Over")
                 }).disabled(textInput.isEmpty)
