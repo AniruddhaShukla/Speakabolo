@@ -239,7 +239,13 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         }
         
         self.output = nil
-        currentUtterance = AVSpeechUtterance(string: inputText)
+        
+        if let ssmlCheckUttterance = AVSpeechUtterance(ssmlRepresentation: inputText) {
+            currentUtterance = ssmlCheckUttterance
+        } else {
+            currentUtterance = AVSpeechUtterance(string: inputText)
+        }
+        
         guard let currentUtterance = currentUtterance else {
             print("Something went wrong.")
             return
