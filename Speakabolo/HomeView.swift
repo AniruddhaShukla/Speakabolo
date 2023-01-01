@@ -25,6 +25,7 @@ struct HomeView: View {
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
     @State private var pitch: Float = 1.0
     @State private var audioControlImage = Image(systemName: "play.circle")
+    @State private var inputTextChanged: Bool = false
     
     @State private var suggestedLanguage: String = "en-GB"
     
@@ -65,9 +66,10 @@ struct HomeView: View {
                     if model.isSpeaking {
                         model.pause()
                     } else {
-                        if model.isInAudioSession {
+                        if model.isInAudioSession && !inputTextChanged {
                             model.resumePlaying()
                         } else {
+                            inputTextChanged = false
                             model.createAudio(forInput: textInput,
                                                  selectedLanguage: selectedLanguage,
                                                  volume: volume,
@@ -113,6 +115,7 @@ struct HomeView: View {
                 TextEditor(text: $textInput).font(.title3)
                     .onChange(of: textInput) { value in
                         model.stop()
+                        inputTextChanged = true
                         model.process(input: textInput)
                     }
                     .frame(minHeight: 300.0)
