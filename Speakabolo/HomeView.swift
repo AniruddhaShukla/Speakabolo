@@ -147,7 +147,14 @@ struct HomeView: View {
                             
                         }
                     }
-                }.pickerStyle(.menu)
+                }.onChange(of: model.selectedVoice, perform: { _ in
+                    model.createAudio(forInput: textInput,
+                                         selectedLanguage: selectedLanguage,
+                                         volume: volume,
+                                         pitch: pitch, speed: speed,
+                                         forVoice: model.selectedVoice)
+                })
+                .pickerStyle(.menu)
             }
             
             Section("Volume") {
