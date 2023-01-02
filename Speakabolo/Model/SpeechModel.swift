@@ -53,6 +53,8 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         cancellable?.cancel()
     }
     
+    var lastProcessedTextInput: String = ""
+    
     // MARK: - Computed Properties
     var elapsedTime: String {
         guard let duration = player?.currentTime else { return "" }
@@ -176,7 +178,9 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     // MARK: - Public Methods
     
     func process(input: String) {
+        self.lastProcessedTextInput = input
         guard detectedLanguage == nil else { return }
+        
         let languageRecognizer = NLLanguageRecognizer()
         languageRecognizer.processString(input)
         let voices = AVSpeechSynthesisVoice.speechVoices()

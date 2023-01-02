@@ -113,10 +113,12 @@ struct HomeView: View {
             
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
-                    .onChange(of: textInput) { value in
+                    .onChange(of: textInput) { newValue in
                         model.stop()
                         inputTextChanged = true
-                        model.process(input: textInput)
+                        if newValue.count - model.lastProcessedTextInput.count >= 30 {
+                            model.process(input: newValue )
+                        }
                     }
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)
