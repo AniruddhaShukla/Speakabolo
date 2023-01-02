@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5492D1402962A48C0063D696 /* AudioSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5492D13F2962A48C0063D696 /* AudioSettings.swift */; };
 		54FE52D7295683240042B1E4 /* SpeakaboloApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */; };
 		54FE52DB295683260042B1E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DA295683260042B1E4 /* Assets.xcassets */; };
 		54FE52DE295683260042B1E4 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 54FE52DD295683260042B1E4 /* Preview Assets.xcassets */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5492D13F2962A48C0063D696 /* AudioSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSettings.swift; sourceTree = "<group>"; };
 		54FE52D3295683240042B1E4 /* Speakabolo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Speakabolo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		54FE52D6295683240042B1E4 /* SpeakaboloApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakaboloApp.swift; sourceTree = "<group>"; };
 		54FE52DA295683260042B1E4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -76,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				54FE52E6295683B80042B1E4 /* SpeechModel.swift */,
+				5492D13F2962A48C0063D696 /* AudioSettings.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -151,6 +154,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				54FE52E7295683B80042B1E4 /* SpeechModel.swift in Sources */,
+				5492D1402962A48C0063D696 /* AudioSettings.swift in Sources */,
 				54FE52E9295683DC0042B1E4 /* HomeView.swift in Sources */,
 				54FE52D7295683240042B1E4 /* SpeakaboloApp.swift in Sources */,
 			);

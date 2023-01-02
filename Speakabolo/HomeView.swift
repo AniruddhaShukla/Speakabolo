@@ -25,9 +25,11 @@ struct HomeView: View {
     @State private var speed: Float = AVSpeechUtteranceDefaultSpeechRate
     @State private var pitch: Float = 1.0
     @State private var audioControlImage = Image(systemName: "play.circle")
-    @State private var inputTextChanged: Bool = false
-    
     @State private var suggestedLanguage: String = "en-GB"
+    
+    var shouldRegenerateAudio: Bool {
+        return textInput != model.lastProcessedTextInput
+    }
     
     var body: some View {
         NavigationView {
@@ -51,6 +53,8 @@ struct HomeView: View {
         }
     }
     
+    @FocusState private var isFocused: Bool
+    
     @ViewBuilder
     private func createMainView() -> some View {
         VStack(alignment: .leading) {
@@ -66,15 +70,10 @@ struct HomeView: View {
                     if model.isSpeaking {
                         model.pause()
                     } else {
-                        if model.isInAudioSession && !inputTextChanged {
+                        if model.isInAudioSession && !shouldRegenerateAudio {
                             model.resumePlaying()
                         } else {
-                            inputTextChanged = false
-                            model.createAudio(forInput: textInput,
-                                                 selectedLanguage: selectedLanguage,
-                                                 volume: volume,
-                                                 pitch: pitch, speed: speed,
-                                                 forVoice: model.selectedVoice)
+                            isFocused = false
                         }
 
                     }
@@ -113,12 +112,18 @@ struct HomeView: View {
             
             ScrollView {
                 TextEditor(text: $textInput).font(.title3)
-                    .onChange(of: textInput) { newValue in
-                        model.stop()
-                        inputTextChanged = true
-                        if newValue.count - model.lastProcessedTextInput.count >= 30 {
-                            model.process(input: newValue )
+                    .focused($isFocused)
+                    .onChange(of: isFocused) { isFocused in
+                        if !isFocused {
+                            model.stop()
+                            model.process(input: textInput)
+                            if shouldRegenerateAudio {
+                                model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, pitch: pitch, speed: speed)
+                            }
                         }
+                    }
+                    .onChange(of: textInput) { newValue in
+                        model.process(input: textInput)
                     }
                     .frame(minHeight: 300.0)
                     .multilineTextAlignment(.leading)

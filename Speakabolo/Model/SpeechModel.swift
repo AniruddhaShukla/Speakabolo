@@ -85,6 +85,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
             print(voice.name + " \(voice.language)" )
         }
         self.voices = Array(Set(voices.filter { $0.language == defaultLanguage }))
+        self.lastAudioSettings = AudioSettings(volume: 0.8, pitch: 1.0, speed: AVSpeechUtteranceDefaultSpeechRate, voice: AVSpeechSynthesisVoice(language: "en-US")!)
         FileManager.default.delegate = self
     }
     
@@ -178,7 +179,6 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
     // MARK: - Public Methods
     
     func process(input: String) {
-        self.lastProcessedTextInput = input
         guard detectedLanguage == nil else { return }
         
         let languageRecognizer = NLLanguageRecognizer()
@@ -187,12 +187,10 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         if let dominantLanguage = languageRecognizer.dominantLanguage {
             self.detectedLanguage = dominantLanguage
             self.voices = voices
-            self.selectedVoice = autoSelectVoice
         } else {
             print("Unable to detect language.")
         }
     }
-    
     /// Auto selects a voice for the user based on the detected language and language code.
     var autoSelectVoice: AVSpeechSynthesisVoice {
         // Set selected voice to detected language
@@ -237,6 +235,25 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
         }
     }
     
+    var lastAudioSettings: AudioSettings?
+    
+    func createAudio(forInput inputText: String,
+                     selectedLanguage: String,
+                     audioSettings settings: AudioSettings) {
+        guard settings != lastAudioSettings && lastProcessedTextInput != inputText else {
+            print("Nothing new here exit.")
+            return
+        }
+        
+        self.lastProcessedTextInput = inputText
+        createAudio(forInput: inputText,
+                    selectedLanguage: selectedLanguage,
+                    volume: settings.volume,
+                    pitch: settings.pitch,
+                    speed: settings.speed)
+    }
+    
+    
     func createAudio(forInput inputText: String,
                      selectedLanguage: String,
                      volume: Float,
@@ -268,7 +285,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
 
         // Retrieve the British English voice.
         if voice == nil {
-            currentUtterance.voice = AVSpeechSynthesisVoice(language: selectedLanguage)
+            currentUtterance.voice = autoSelectVoice
         } else {
             // Assign the voice to the utterance.
             currentUtterance.voice = voice
