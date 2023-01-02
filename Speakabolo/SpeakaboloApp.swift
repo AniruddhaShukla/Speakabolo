@@ -14,6 +14,7 @@ struct SpeakaboloApp: App {
             HomeView().frame(width: 1200, height: 800)
         }.commands {
             SidebarCommands()
+            TextEditingCommands()
         }
     }
 }
