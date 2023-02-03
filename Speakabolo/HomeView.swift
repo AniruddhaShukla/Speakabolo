@@ -119,6 +119,8 @@ struct HomeView: View {
                             model.process(input: textInput)
                             if shouldRegenerateAudio {
                                 model.createAudio(forInput: textInput, selectedLanguage: selectedLanguage, volume: volume, pitch: pitch, speed: speed)
+                            } else {
+                                model.resumePlaying()
                             }
                         }
                     }

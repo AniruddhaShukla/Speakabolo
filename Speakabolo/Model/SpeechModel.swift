@@ -260,6 +260,7 @@ final class SpeechModel: NSObject, ObservableObject, AVSpeechSynthesizerDelegate
                      pitch: Float = 1.0,
                      speed: Float,
                      forVoice voice: AVSpeechSynthesisVoice? = nil) {
+        self.lastProcessedTextInput = inputText
         if player?.isPlaying ?? false {
             print("A play is already in progress.")
             player?.stop()
